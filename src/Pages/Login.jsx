@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
@@ -8,11 +8,29 @@ import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import validation from './Validate';
 
 
 function Login({ insideRegister }) {
 
     const navigate = useNavigate()
+
+    const [values, setValues] = useState({
+        name: "",
+        email:"",
+        password: ""
+    })
+
+    const [errors, setErrors] = useState({})
+
+    const handleChange = (e) => {
+        setValues({ ...values, [e.target.name]: e.target.value })
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        setErrors(validation(values))
+    }
 
     return (
         <>
@@ -34,7 +52,7 @@ function Login({ insideRegister }) {
                         <div>
                             <h3>Welcome to Materio!<i class="fa-regular fa-hand-peace"></i></h3>
                             <p>Please sign-{insideRegister ? 'up' : 'in'} to your account and start the adventures!</p>
-                            <Form>
+                            <Form onSubmit={handleSubmit}>
                                 {
                                     insideRegister &&
                                     <FloatingLabel
@@ -42,7 +60,8 @@ function Login({ insideRegister }) {
                                         label="Username"
                                         className="mb-3"
                                     >
-                                        <Form.Control type="text" placeholder="Username" />
+                                        <Form.Control value={values.name} type="text" placeholder="Username" name='name' onChange={handleChange} />
+                                        {errors.name && <p style={{ color: 'red', fontSize: '13px' }}>{errors.name}</p>}
                                     </FloatingLabel>
                                 }
                                 <FloatingLabel
@@ -50,14 +69,20 @@ function Login({ insideRegister }) {
                                     label="Email"
                                     className="mb-3"
                                 >
-                                    <Form.Control type="email" placeholder="name@example.com" />
+                                    <Form.Control value={values.email} type="email" placeholder="name@example.com" name='email' onChange={handleChange} />
+                                    {errors.email && <p style={{ color: 'red', fontSize: '13px' }}>{errors.email}</p>}
                                 </FloatingLabel>
 
                                 <FloatingLabel controlId="floatingPassword" label="Password" className='mb-3'>
-                                    <Form.Control type="password" placeholder="Password" />
+                                    <Form.Control value={values.password} type="password" placeholder="Password" name='password' onChange={handleChange} />
+                                    {errors.password && <p style={{ color: 'red', fontSize: '13px' }}>{errors.password}</p>}
                                 </FloatingLabel>
                                 <div className='d-flex justify-content-center'>
-                                    <button className='btn btn-success w-50'>SUBMIT</button>
+                                    {insideRegister ?
+                                        <button type='submit' className='btn btn-success w-50'>REGISTER</button>
+                                        :
+                                        <button type='submit' className='btn btn-success w-50'>LOGIN</button>
+                                    }
                                 </div>
                                 <div className='d-flex justify-content-between mt-3'>
                                     <div><input className='me-1' type="checkbox" name="" id="" />Remember me</div>
